@@ -12,13 +12,11 @@ function App() {
     setStatus('Data save ho raha hai... ⏳');
 
     try {
-      const table = await bitable.base.getActiveTable();
+      const table = await bitable.base.getTableById("tblkXSPDlbXi19T0");
 
       const nameField = await table.getFieldByName("User Name");
       const emailField = await table.getFieldByName("Email");
       const roleField = await table.getFieldByName("Role");
-
-      // ---- MAGIC TRICK 2.0: ROLE KI INTERNAL ID NIKALNA ----
 
       // 1. Sheet se Role column ke saare options (Admin, Super User) mangwa lo
       const allOptions = await roleField.getOptions();
