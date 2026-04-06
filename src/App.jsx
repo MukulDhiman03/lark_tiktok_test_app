@@ -9,47 +9,36 @@ function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setStatus('Data save ho raha hai... ⏳');
+    setStatus('Backend ko data bhej raha hoon... 🚀');
 
     try {
-      const table = await bitable.base.getTableById("tblkXSPDlbXi19T0");
-
-      const nameField = await table.getFieldByName("User Name");
-      const emailField = await table.getFieldByName("Email");
-      const roleField = await table.getFieldByName("Role");
-
-      // 1. Sheet se Role column ke saare options (Admin, Super User) mangwa lo
-      const allOptions = await roleField.getOptions();
-
-      // 2. Jo role user ne form me select kiya hai, uski ID dhoondho
-      const selectedOption = allOptions.find(opt => opt.name === role);
-
-      // Agar by-chance option sheet me nahi hai, toh form ruk jayega aur bata dega
-      if (!selectedOption) {
-        setStatus(`Error: "${role}" option sheet me nahi mila. Check spelling!`);
-        return;
-      }
-
-      // 3. Un IDs ka use karke Lark me data bhejna
-      await table.addRecord({
-        fields: {
-          [nameField.id]: name,
-          [emailField.id]: email,
-
-          // Ab hum text nahi, direct Option ID bhej rahe hain
-          [roleField.id]: { id: selectedOption.id }
-        }
+      // --- YE RAHI AAPKI ASLI API CALL (FETCH) ---
+      const response = await fetch("http://localhost:5000/add-user", {
+        method: "POST", // Data bhej rahe hain
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: name,
+          email: email,
+          role: role
+        }),
       });
 
-      setStatus('Success! Data Lark sheet me chala gaya 🎉');
-      setName('');
-      setEmail('');
+      const result = await response.json();
 
-      setTimeout(() => setStatus(''), 3000);
+      if (result.success) {
+        setStatus('Success! Backend ne Lark me save kar diya 🎉');
+        setName('');
+        setEmail('');
+      } else {
+        setStatus('Error: ' + JSON.stringify(result.error));
+      }
+      // ------------------------------------------
 
     } catch (error) {
       console.error(error);
-      setStatus('Error: ' + error.message);
+      setStatus('Error: Backend server band hai ya connect nahi ho raha!');
     }
   };
 
